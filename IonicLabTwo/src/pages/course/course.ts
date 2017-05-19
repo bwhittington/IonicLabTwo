@@ -24,7 +24,6 @@ export class CoursePage {
     private fileOpener: FileOpener;
     private filePath: FilePath;
 
-
     constructor(navCtrl: NavController, navParams: NavParams, courseService: CourseService, file: File, fileOpener: FileOpener, filePath: FilePath) {
         this.courseService = courseService;
         this.navParams = navParams;
@@ -42,13 +41,13 @@ export class CoursePage {
 
     public openDocument(filePathString: string): void {
         this.filePath.resolveNativePath(this.file.applicationDirectory + 'www/assets/documents/' + filePathString)
-            .then(filePath => this.file.checkFile(this.file.applicationDirectory + 'www/assets/documents/', filePathString)
-                .then(filePath => this.file.copyFile(this.file.applicationDirectory + 'www/assets/documents/', filePathString, this.file.externalDataDirectory, filePathString)
-                    .then(path => this.fileOpener.open(this.file.externalDataDirectory + filePathString, 'application/pdf')
+            .then(() => this.file.checkFile(this.file.applicationDirectory + 'www/assets/documents/', filePathString)
+                .then(() => this.file.copyFile(this.file.applicationDirectory + 'www/assets/documents/', filePathString, this.file.externalDataDirectory, filePathString)
+                    .then(() => this.fileOpener.open(this.file.externalDataDirectory + filePathString, 'application/pdf')
                         .then(() => console.log('File is opened'))
                         .catch(e => console.log('Error opening file', e)))
                     .catch(e => console.log('Error copying file', e)))
-                .catch(err => console.log('File doesnt exist')))
-            .catch(err => console.log(err));
+                .catch(e => console.log('File doesnt exist', e)))
+            .catch(e => console.log(e));
     }
 }
