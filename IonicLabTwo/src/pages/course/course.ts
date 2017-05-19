@@ -1,5 +1,6 @@
 ﻿import { Component } from '@angular/core';
 import { IonicPage, NavController, NavParams } from 'ionic-angular';
+import { File } from '@ionic-native/file';
 import { FileOpener } from '@ionic-native/file-opener';
 import { FilePath } from '@ionic-native/file-path';
 
@@ -19,14 +20,17 @@ export class CoursePage {
     private navCtrl: NavController;
     private navParams: NavParams;
     private id: number;
+    private file: File;
     private fileOpener: FileOpener;
     private filePath: FilePath;
 
-    constructor(navCtrl: NavController, navParams: NavParams, courseService: CourseService, filePath: FilePath, fileOpener: FileOpener ) {
+
+    constructor(navCtrl: NavController, navParams: NavParams, courseService: CourseService, file: File, fileOpener: FileOpener, filePath: FilePath) {
         this.courseService = courseService;
         this.navParams = navParams;
-        this.filePath = filePath;
+        this.file = file;
         this.fileOpener = fileOpener;
+        this.filePath = filePath;
 
         this.id = this.navParams.get('id');
         this.courseModel = this.courseService.getCourse(this.id);
@@ -37,10 +41,14 @@ export class CoursePage {
     }
 
     public openDocument(filePathString: string): void {
-        this.filePath.resolveNativePath(filePathString)
-            .then(path => this.fileOpener.open(path, 'application/pdf')
-                .then(() => console.log('File is opened'))
-                .catch(e => console.log('Error openening file', e)))
+        this.filePath.resolveNativePath(this.file.applicationDirectory + 'www/assets/documents/' + filePathString)
+            .then(filePath => this.file.checkFile(this.file.applicationDirectory + 'www/assets/documents/', filePathString)
+                .then(filePath => this.file.copyFile(this.file.applicationDirectory + 'www/assets/documents/', filePathString, this.file.externalDataDirectory, filePathString)
+                    .then(path => this.fileOpener.open(this.file.externalDataDirectory + filePathString, 'application/pdf')
+                        .then(() => console.log('File is opened'))
+                        .catch(e => console.log('Error opening file', e)))
+                    .catch(e => console.log('Error copying file', e)))
+                .catch(err => console.log('File doesnt exist')))
             .catch(err => console.log(err));
     }
 }
